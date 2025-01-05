@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { getUserByEmail } from "./server-utils";
 import { authSchema } from "./validations";
 import { nextAuthEdgeConfig } from "./auth-edge";
+import prisma from "./db";
 
 const config = {
   ...nextAuthEdgeConfig,
@@ -21,7 +22,11 @@ const config = {
         // extract values
         const { email, password } = validatedFormData.data;
 
-        const user = await getUserByEmail(email);
+        const user = await prisma.user.findUnique({
+          where: {
+            email,
+          },
+        });
         if (!user) {
           console.log("User not found");
           return null;
